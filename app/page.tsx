@@ -1,65 +1,86 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
-  return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+import React, { useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { Search, Package, Calculator, Wand2, Rocket, AlertTriangle, CheckCircle2, Copy, Download, Sparkles } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+
+const nicheTemplates = {
+  pet: {
+    examples: ["Mist spray grooming brush", "Pet hair remover glove", "Slow feeder bowl", "Travel water bottle"],
+    keywords: ["pet grooming brush", "dog grooming brush", "cat grooming brush", "deshedding tool", "pet hair remover", "dog brush for loose hair"],
+    risks: ["Weak product quality can cause bad reviews", "Avoid misleading claims like real steam", "Check battery safety for rechargeable items"],
+    branding: ["PawMist", "FurEase", "PetGlow", "ShedLess"],
+  },
+  kitchen: {
+    examples: ["Drawer organiser", "Reusable food wraps", "Air fryer liners", "Under-sink organiser"],
+    keywords: ["kitchen organiser", "drawer organiser", "air fryer accessories", "food storage", "plastic free kitchen"],
+    risks: ["Watch bulky shipping costs", "Avoid fragile glass products", "Differentiate from generic listings"],
+    branding: ["HomeNest", "KlearKitchen", "EcoTidy", "Nestora"],
+  },
+  fitness: {
+    examples: ["Resistance bands", "Grip strength trainer", "Yoga blocks", "Massage ball set"],
+    keywords: ["resistance bands", "home workout kit", "fitness accessories", "exercise bands", "yoga accessories"],
+    risks: ["High competition", "Product durability is critical", "Avoid medical claims"],
+    branding: ["FlexCore", "FitEase", "HomeForm", "PulseGear"],
+  },
+  baby: {
+    examples: ["Silicone night light", "Nappy caddy", "White noise machine", "Pram organiser"],
+    keywords: ["baby night light", "nappy organiser", "baby sleep aid", "portable baby organiser", "baby gift"],
+    risks: ["Higher compliance expectations", "Avoid unsafe materials", "Parents read reviews carefully"],
+    branding: ["LittleGlow", "Nurtura", "BabyNest", "TinyEase"],
+  },
+  car: {
+    examples: ["Boot organiser", "Car cleaning gel", "Phone holder", "Seat gap filler"],
+    keywords: ["car accessories", "car organiser", "car phone holder", "boot organiser", "car cleaning"],
+    risks: ["Phone holders can have compatibility issues", "Avoid products that distract drivers", "Check returns risk"],
+    branding: ["AutoNest", "DriveEase", "RoadTidy", "GearMate"],
+  },
+  generic: {
+    examples: ["Low-cost accessory", "Problem-solving bundle", "Giftable item", "Reusable household product"],
+    keywords: ["best seller", "problem solving product", "low competition product", "gift for", "accessory"],
+    risks: ["Validate demand before ordering", "Avoid saturated products", "Check compliance and returns risk"],
+    branding: ["EaseCo", "NovaGoods", "SimpleNest", "PrimeCraft"],
+  },
+};
+
+function detectTemplate(niche) {
+  const n = niche.toLowerCase();
+  if (n.includes("pet") || n.includes("dog") || n.includes("cat")) return nicheTemplates.pet;
+  if (n.includes("kitchen") || n.includes("home") || n.includes("organ")) return nicheTemplates.kitchen;
+  if (n.includes("fit") || n.includes("gym") || n.includes("yoga")) return nicheTemplates.fitness;
+  if (n.includes("baby") || n.includes("parent")) return nicheTemplates.baby;
+  if (n.includes("car") || n.includes("auto")) return nicheTemplates.car;
+  return nicheTemplates.generic;
+}
+
+function currency(n) {
+  return `£${Number(n || 0).toFixed(2)}`;
+}
+
+export default function AmazonNicheLauncherApp() {
+  const [niche, setNiche] = useState("Pet grooming");
+  const [budget, setBudget] = useState(500);
+  const [sellPrice, setSellPrice] = useState(14.99);
+  const [unitCost, setUnitCost] = useState(2.2);
+  const [shippingPerUnit, setShippingPerUnit] = useState(1.0);
+  const [amazonFees, setAmazonFees] = useState(5.8);
+  const [adCost, setAdCost] = useState(1.2);
+
+  const template = useMemo(() => detectTemplate(niche), [niche]);
+
+  const profit = useMemo(() => {
+    const totalCost = Number(unitCost) + Number(shippingPerUnit) + Number(amazonFees) + Number(adCost);
+    const unitProfit = Number(sellPrice) - totalCost;
+    const landedCost = Number(unitCost) + Number(shippingPerUnit);
+    const estimatedUnits = Math.max(0, Math.floor(Number(budget) / Math.max(landedCost, 0.01)));
+    const projectedProfit = unitProfit * estimatedUnits;
+    const margin = sellPrice > 0 ? (unitProfit / Number(sellPrice)) * 100 : 0;
+    return { totalCost, unitProfit, landedCost, estimatedUnits, projectedProfit, margin };
+  }, [budget, sellPrice, unitCost, shippingPerUnit, amazonFees, adCost]);
+
+  const productIdea = template.examples[0];
+  const brandName = template.branding[0];
+
 }
